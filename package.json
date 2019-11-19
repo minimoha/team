@@ -1,0 +1,19 @@
+{
+  "name": "teamwork-api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/minimoha/teamwork-api.git"
+  },
+  "author": "Muhammed Adegbola",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/minimoha/teamwork-api/issues"
+  },
+  "homepage": "https://github.com/minimoha/teamwork-api#readme"
+}
