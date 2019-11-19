@@ -21,6 +21,7 @@
   },
   "homepage": "https://github.com/minimoha/teamwork-api#readme",
   "devDependencies": {
+    "coveralls": "^3.0.7",
     "eslint": "^6.6.0",
     "jest": "^24.9.0",
     "prettier-eslint": "^9.0.1",
