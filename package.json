@@ -5,7 +5,10 @@
   "main": "server.js",
   "scripts": {
     "lint": "eslint **/*.js",
-    "lint:fix": "prettier-eslint **/*.js --write"
+    "lint:fix": "prettier-eslint **/*.js --write",
+    "test": "jest",
+    "test:coverage": "jest --coverage",
+    "test:coveralls": "jest --coverage --coverageReporters=text-lcov | coveralls"
   },
   "repository": {
     "type": "git",
@@ -19,6 +22,7 @@
   "homepage": "https://github.com/minimoha/teamwork-api#readme",
   "devDependencies": {
     "eslint": "^6.6.0",
+    "jest": "^24.9.0",
     "prettier-eslint": "^9.0.1",
     "prettier-eslint-cli": "^5.0.0"
   }
