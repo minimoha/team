@@ -43,36 +43,6 @@ exports.createArticle = (req, res) => {
     });
 };
 
-exports.getOneArticle = () => {
-    
-    const text = `SELECT * FROM articles ORDER BY createdOn`
-
-    pool.connect((err, client, done) => {
-        if (err) {
-            console.log("Can not connect to the DB" + err);
-        } else {
-            console.log("Successful connection")
-        }
-        client.query(text, (error, result) => {
-        console.log(text)
-            done();
-            if (error) {
-            return res.status(404).json({error});
-            } else {
-            return res.status(200).json({
-            status: 'Success', 
-            data: {
-                id: result.rows[0].id,
-                createdOn: result.rows.createdOn,
-                password: result.rows[0].password,
-                imgurl: result.rows[0].imgurl
-            }
-            })
-        }
-        });
-    });
-};
-
 exports.editArticle = (req, res) => {
     const _id = req.params.articleId;
     
@@ -101,6 +71,31 @@ exports.editArticle = (req, res) => {
                 message: "Article successfully updated",
                 title: result.rows[0].title,
                 article: result.rows[0].article                
+            }
+          })
+        }
+        });
+    });
+};
+
+exports.deleteArticle = (req, res, next) => {
+    const _id = req.params.articleId;
+    pool.connect((err, client, done) => {
+        if (err) {
+            console.log("Can not connect to the DB" + err);
+        } else {
+            console.log("Successful connection")
+        }
+        const text = `DELETE FROM articles WHERE id = ${_id}`
+        client.query(text, (error, result) => {
+          done();
+          if (error) {
+            return res.status(404).json({error});
+          } else {
+          return res.status(200).json({
+            status: 'Success',
+            data: {
+                "message": "Article successfully deleted"
             }
           })
         }
