@@ -1,5 +1,4 @@
 const { Pool } = require("pg");
-const path = require("path");
 const cloudinary = require("cloudinary").v2;
 require("dotenv").config();
 
@@ -59,15 +58,42 @@ exports.createGif = async (req, res) => {
         return res.status(202).json({
           status: "success",
           data: {
-            message: "User account successfully created",
-            userId: result.rows[0].id,
-            gifurl: result.rows[0].url,
-            created: result.rows[0].created,
-            create: result.rows[0].timestamp
+            gifId: result.rows[0].id,
+            message: "GIF image successfully posted",
+            createdOn: result.rows[0].created,
+            title: result.rows[0].title,
+            imageUrl: result.rows[0].url
             
           }
         });
       }
     });
   });
+};
+
+exports.deleteGif = (req, res) => {
+    const _id = req.params.gifId;
+
+    pool.connect((err, client, done) => {
+        if (err) {
+            console.log("Can not connect to the DB" + err);
+        } else {
+            console.log("Successful connection")
+        }
+        const text = `DELETE FROM gifs WHERE id = ${_id}`
+        client.query(text, (error, result) => {
+          done();
+          if (error) {
+              console.log(error)
+            return res.status(404).json({error});
+          } else {
+          return res.status(200).json({
+            status: 'Success',
+            data: {
+                "message": "Gif post successfully deleted"
+            }
+          })
+        }
+        });
+    });
 };
