@@ -102,3 +102,43 @@ exports.deleteArticle = (req, res, next) => {
         });
     });
 };
+
+exports.createArticleComment = (req, res) => {
+    const _id = req.params.articleId
+    
+    const comment = req.body.comment
+
+    const text = `INSERT INTO articlecomment(comment, articleid) VALUES($1, $2) RETURNING *`
+    const values = [comment, _id]
+    
+    const query = `SELECT a.title, a.article, c.comment, c.created
+                    FROM articlecomment c
+                    INNER JOIN articles a ON c.articleid = a.id`
+    pool.connect((err, client, done) => {
+        if (err) {
+            console.log("Can not connect to the DB" + err);
+        } else {
+            console.log("Successful connection")
+        }
+        client.query(text, values, () => {
+            client.query(query, (error, result) => {      
+                done();
+                if (error) {
+                    console.log(error)
+                return res.status(400).json({error});
+                } else {
+                    return res.status(202).send({
+                        status: 'success',
+                        data: {
+                            message: "Comment successfully created",
+                            createdOn: result.rows[0].created,
+                            articleTitle: result.rows[0].title,
+                            article: result.rows[0].article,
+                            comment: result.rows[0].comment
+                        }
+                    })
+                }
+            });
+        });
+    });
+};
