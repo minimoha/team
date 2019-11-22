@@ -97,3 +97,42 @@ exports.deleteGif = (req, res) => {
         });
     });
 };
+
+exports.createGifComment = (req, res) => {
+    const _id = req.params.gifId
+    
+    const comment = req.body.comment
+
+    const text = `INSERT INTO gifcomment(comment, gifid) VALUES($1, $2) RETURNING *`
+    const values = [comment, _id]
+    
+    const query = `SELECT a.title, a.url, c.comment, c.created
+                    FROM gifcomment c
+                    INNER JOIN gifs a ON c.gifid = a.id`
+    pool.connect((err, client, done) => {
+        if (err) {
+            console.log("Can not connect to the DB" + err);
+        } else {
+            console.log("Successful connection")
+        }
+        client.query(text, values, () => {
+            client.query(query, (error, result) => {      
+                done();
+                if (error) {
+                    console.log(error)
+                return res.status(400).json({error});
+                } else {
+                    return res.status(202).send({
+                        status: 'success',
+                        data: {
+                            message: "Comment successfully created",
+                            createdOn: result.rows[0].created,
+                            gifTitle: result.rows[0].title,
+                            comment: result.rows[0].comment
+                        }
+                    })
+                }
+            });
+        });
+    });
+};
