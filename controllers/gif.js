@@ -19,7 +19,9 @@ cloudinary.config({
 
 exports.createGif = async (req, res) => {
   const file = req.files.url;
-    console.log(file)
+  const title = req.body.title
+
+console.log(file)
   if ( file.mimetype === "image/jpeg" || file.mimetype === "image/jpg" || file.mimetype === "image/png") {
     return res.status(400).json({
       message: "Upload error, file must be gif"
@@ -39,8 +41,8 @@ exports.createGif = async (req, res) => {
       console.log(error);
     });
 
-  const text = `INSERT INTO gifs(title, url, createdat) VALUES($1, $2, $3) RETURNING *`;
-  const values = ["firstname", u.url, u.created_at];
+  const text = `INSERT INTO gifs(title, url) VALUES($1, $2) RETURNING *`;
+  const values = [title, u.url];
 
   pool.connect((err, client, done) => {
     if (err) {
@@ -133,6 +135,34 @@ exports.createGifComment = (req, res) => {
                     })
                 }
             });
+        });
+    });
+};
+
+exports.getOneGif = (req, res) => {
+    
+    const _id = req.params.gifId;
+
+    const text = `SELECT * FROM gifs WHERE id = ${_id}`
+
+    pool.connect((err, client, done) => {
+        if (err) {
+            console.log("Can not connect to the DB" + err);
+        } else {
+            console.log("Successful connection")
+        }
+        client.query(text, (error, result) => {
+        
+          done();
+          if (error) {
+            console.log(error)
+            return res.status(404).json({error});
+          } else {
+          return res.status(200).json({
+            status: 'success', 
+            data: result.rows
+          })
+        }
         });
     });
 };

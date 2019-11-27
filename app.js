@@ -1,7 +1,16 @@
 const express = require("express");
 const bodyParser = require("body-parser");
-
 const app = express();
+const fileUpload = require("express-fileupload");
+
+const userRoutes = require("./routes/user");
+const gifRoutes = require("./routes/gif");
+const articleRoutes = require("./routes/article");
+
+app.use(fileUpload({
+  useTempFiles : true,
+  tempFileDir : '/tmp/'
+}));
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -19,13 +28,8 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use("/", function(req, res, next) {
-  res.send("Hello World");
-  next();
-});
-
-app.use((req, res) => {
-  res.json({ message: "Your request was successful!" });
-});
+app.use("/api/v1", userRoutes);
+app.use("/api/v1", gifRoutes);
+app.use("/api/v1", articleRoutes);
 
 module.exports = app;

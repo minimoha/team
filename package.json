@@ -21,6 +21,8 @@
   },
   "homepage": "https://github.com/minimoha/teamwork-api#readme",
   "devDependencies": {
+    "chai": "^4.2.0",
+    "chai-http": "^4.3.0",
     "coveralls": "^3.0.7",
     "eslint": "^6.6.0",
     "jest": "^24.9.0",
@@ -36,6 +38,7 @@
     "express": "^4.17.1",
     "express-fileupload": "^1.1.6",
     "jsonwebtoken": "^8.5.1",
-    "pg": "^7.13.0"
+    "pg": "^7.13.0",
+    "request": "^2.88.0"
   }
 }

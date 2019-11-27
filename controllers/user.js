@@ -3,14 +3,15 @@ const { Pool } = require("pg");
 const jwt = require("jsonwebtoken");
 
 const connectionString =
-  "postgresql://muhammed:password12@localhost:5432/teamwork";
+"postgres://apzfgirgwbiqux:97b7c75a1b47598bf01ad73a2c32a89117cd72cda6d36fe13528fd2b997dfad7@ec2-54-243-49-82.compute-1.amazonaws.com:5432/d3gu8nqn8pulh2";
+  // "postgresql://muhammed:password12@localhost:5432/teamwork";
 const pool = new Pool({
-  connectionString: connectionString
+  connectionString: connectionString,
+  ssl: true,
 });
 
-
 exports.createUser = (req, res) => {
-//   const _id = req.params.id;
+  //   const _id = req.params.id;
   const firstName = req.body.firstname;
   const lastName = req.body.lastname;
   const email = req.body.email;
@@ -22,7 +23,7 @@ exports.createUser = (req, res) => {
   let salt = bcrypt.genSaltSync(10);
   let hash = bcrypt.hashSync(password, salt);
 
-    const text = `INSERT INTO users (firstname, lastname, email, 
+  const text = `INSERT INTO users (firstname, lastname, email, 
                     password, jobrole, department, 
                     address) VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING *`;
 
@@ -47,7 +48,6 @@ exports.createUser = (req, res) => {
       done();
       if (error) {
         return res.status(400).json({ error });
-        
       } else {
         const token = jwt.sign(
           { userId: result.rows[0] },
@@ -56,7 +56,7 @@ exports.createUser = (req, res) => {
         );
 
         return res.status(202).send({
-          status: "success",
+          status: "Success",
           data: {
             message: "User account successfully created",
             token: token,
@@ -70,43 +70,45 @@ exports.createUser = (req, res) => {
 };
 
 exports.signIn = (req, res) => {
-    const email = req.body.email
-    const password = req.body.password
+  const email = req.body.email;
+  const password = req.body.password;
 
+  const query = {
+    text: "SELECT * FROM users WHERE email=$1",
+    values: [email]
+  };
 
-    const query = {
-        text: 'SELECT * FROM users WHERE email=$1',
-        values: [email],
+  pool.connect((err, client, done) => {
+    if (err) {
+      console.log("Can not connect to the DB" + err);
+    } else {
+      console.log("Successful connection");
+    }
+
+    client.query(query, (error, result) => {
+      done();
+      if (error) {
+        console.log(error);
+        return res.status(404).json({ error });
       }
 
-    pool.connect((err, client, done) => {
-        if (err) {
-            console.log("Can not connect to the DB" + err);
-        } else {
-            console.log("Successful connection")
-        }
+      let passFromDb = bcrypt.compareSync(password, result.rows[0].password);
 
-        client.query(query, (error, result) => {
-            done();
-            if (error) {
-                console.log(error);
-            return res.status(400).json({error});
-            }
-            
-            let passFromDb = bcrypt.compareSync(password, result.rows[0].password);
-            
-            const token = jwt.sign({userId: result.rows[0].id }, 'RANDOM_TOKEN_SECRET', 
-                {expiresIn: '24h'});
+      const token = jwt.sign(
+        { userId: result.rows[0].id },
+        "RANDOM_TOKEN_SECRET",
+        { expiresIn: "24h" }
+      );
 
-            if(passFromDb) {
-                return res.status(202).send({
-                    status: 'Success', data: {
-                    token: token,
-                    userId: result.rows[0].id
-                    }
-                })
-            }
-            
+      if (passFromDb) {
+        return res.status(202).send({
+          status: "Success",
+          data: {
+            token: token,
+            userId: result.rows[0].id
+          }
         });
+      }
     });
+  });
 };
